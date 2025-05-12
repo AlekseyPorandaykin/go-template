@@ -1,4 +1,4 @@
-package metrics
+package monitoring
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func Handler() error {
+func Handler(host, port string) error {
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/healthz", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusOK)
@@ -18,7 +18,7 @@ func Handler() error {
 	http.HandleFunc("/readyz", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusOK)
 	})
-	if err := http.ListenAndServe(":8081", nil); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	if err := http.ListenAndServe(net.JoinHostPort(host, port), nil); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 	return nil

@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"context"
-	"errors"
-	"net"
-
 	"github.com/AlekseyPorandaykin/go-template/pkg/server/http"
-	"github.com/AlekseyPorandaykin/go-template/pkg/shutdown"
+	"github.com/AlekseyPorandaykin/go-template/pkg/system"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+	"net"
 )
 
 var webCmd = &cobra.Command{
@@ -19,13 +18,12 @@ var webCmd = &cobra.Command{
 		defer cancel()
 		s := http.NewServer()
 		defer s.Close()
-		go func() {
-			defer shutdown.HandlePanic()
+		system.Go(func() {
 			defer cancel()
 			if err := s.Run("localhost", "8080"); err != nil && !errors.Is(err, net.ErrClosed) {
 				zap.L().Error("error run server", zap.Error(err))
 			}
-		}()
+		})
 		<-ctx.Done()
 	},
 }
