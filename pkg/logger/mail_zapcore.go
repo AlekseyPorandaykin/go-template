@@ -70,7 +70,7 @@ func (m *MailZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 Logger Name: %s
 Level: %s
 Time: %s
-Message: %s
+Receive: %s
 
 `
 	body := fmt.Sprintf(message, entry.LoggerName, entry.Level.String(), entry.Time.String(), entry.Message)

@@ -1,8 +1,7 @@
 package secrets
 
 import (
-	"github.com/golang-module/dongle"
-	_ "github.com/golang-module/dongle"
+	"github.com/dromara/dongle"
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"strconv"
@@ -36,9 +35,9 @@ func HiddenUid(uid uuid.UUID) string {
 }
 
 func DecodePassword(data string) string {
-	return dongle.Decrypt.FromRawString(data).ByRsa(viper.GetString("secret.rsa.private_key")).ToString()
+	return dongle.Decrypt.FromRawString(data).ByRsa([]byte(viper.GetString("secret.rsa.private_key"))).ToString()
 }
 
 func EncodePassword(data string) string {
-	return dongle.Encrypt.FromString(data).ByRsa(viper.GetString("secret.rsa.public_key")).ToRawString()
+	return dongle.Encrypt.FromString(data).ByRsa([]byte(viper.GetString("secret.rsa.public_key"))).ToRawString()
 }
