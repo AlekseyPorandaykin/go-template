@@ -17,6 +17,7 @@ type DBConfig struct {
 	Host               string
 	Port               string
 	Database           string
+	SchemaName         string
 	MaxOpenConnections int
 	MaxIdleConnections int
 
@@ -47,18 +48,19 @@ func dbConnection(conf DBConfig) (*sqlx.DB, error) {
 }
 
 func postgresConnection(conf DBConfig) (*sqlx.DB, error) {
-	conn, err := sqlx.Connect(
-		"pgx",
-		fmt.Sprintf(
-			"%s://%s:%s@%s:%s/%s",
-			conf.Driver,
-			conf.Username,
-			conf.Password,
-			conf.Host,
-			conf.Port,
-			conf.Database,
-		),
+	dsn := fmt.Sprintf(
+		"%s://%s:%s@%s:%s/%s",
+		conf.Driver,
+		conf.Username,
+		conf.Password,
+		conf.Host,
+		conf.Port,
+		conf.Database,
 	)
+	if conf.SchemaName != "" {
+		dsn += fmt.Sprintf("?search_path=%s", conf.SchemaName)
+	}
+	conn, err := sqlx.Connect("pgx", dsn)
 	if err != nil {
 		return nil, err
 	}
